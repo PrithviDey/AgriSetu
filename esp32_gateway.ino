@@ -47,6 +47,9 @@ int history_index = 0;
 int history_count = 0;
 int current_entropy_idx = 0;
 
+// Collision rate values for wire protocol (maps noise_level to CR)
+const float FAIL_PROB_WIRE[4] = {0.05, 0.20, 0.40, 0.60};
+
 void updateEntropy(bool was_collision) {
     col_history[history_index] = was_collision ? 1 : 0;
     history_index = (history_index + 1) % COL_WINDOW;
@@ -94,12 +97,45 @@ void OnDataRecv(const esp_now_recv_info_t *info, const uint8_t *incomingData, in
     // Update entropy (success = received without collision)
     updateEntropy(false);
 
-    // Priority labels
-    const char* prio_labels[] = {"NORMAL", "WARNING", "CRITICAL"};
-    const char* noise_labels[] = {"LOW", "MED", "HIGH", "V.HIGH"};
+    // Priority labels for wire protocol
+    const char* prio_wire[] = {"normal", "warning", "critical"};
+    int prio_idx = constrain(msg.priority, 0, 2);
 
-    // We are no longer printing per-packet logs here to keep the Serial Monitor clean.
-    // The Gateway will only print the 5-second dashboard in the main loop.
+    // ── WIRE PROTOCOL: Node telemetry frame ──
+    // {"t":"nd","id":<int>,"rssi":<float>,"sf":<int>,"cr":<float>,"bat":<float>}
+    Serial.print("{\"t\":\"nd\",\"id\":");
+    Serial.print(msg.sensor_id);
+    Serial.print(",\"rssi\":");
+    Serial.print(WiFi.RSSI());
+    Serial.print(",\"sf\":7,\"cr\":");
+    Serial.print(FAIL_PROB_WIRE[msg.noise_level]);
+    Serial.print(",\"bat\":95.0");
+    // Include environmental data as extra fields
+    Serial.print(",\"soil\":");
+    Serial.print(msg.soil_moisture);
+    Serial.print(",\"temp\":");
+    Serial.print(msg.temperature);
+    Serial.print(",\"hum\":");
+    Serial.print(msg.humidity);
+    Serial.print(",\"rain\":");
+    Serial.print(msg.rainfall);
+    Serial.print(",\"noise\":");
+    Serial.print(msg.noise_level);
+    Serial.println("}");
+
+    // ── WIRE PROTOCOL: Transmission result frame ──
+    // {"t":"tx","id":<int>,"ok":<0|1>,"pri":<str>,"e":<float>,"lat":<float>,"act":<0-4>}
+    bool sim_fail = (random(0, 100) < (int)(FAIL_PROB_WIRE[msg.noise_level] * 100));
+    Serial.print("{\"t\":\"tx\",\"id\":");
+    Serial.print(msg.sensor_id);
+    Serial.print(",\"ok\":");
+    Serial.print(sim_fail ? 0 : 1);
+    Serial.print(",\"pri\":\"");
+    Serial.print(prio_wire[prio_idx]);
+    Serial.print("\",\"e\":0.082,\"lat\":");
+    Serial.print(millis() % 500);
+    Serial.print(",\"act\":2}");
+    Serial.println();
 
     // Send ACK back to the sender node using its MAC from info->src_addr
     ackData.success = true;
@@ -133,61 +169,16 @@ void setup() {
 // ============================================================================
 // Main Loop — Print Dashboard every 10 seconds
 // ============================================================================
-unsigned long last_dashboard = 0;
-
 void loop() {
-    if (millis() - last_dashboard > 5000) {
-        last_dashboard = millis();
-
-        Serial.println();
-        Serial.println("╔══════════════════════════════════════════════════════════════╗");
-        Serial.println("║              AGRISETU GATEWAY — LIVE DASHBOARD              ║");
-        Serial.println("╠══════════════════════════════════════════════════════════════╣");
-        Serial.print("║  Total Packets : ");
-        Serial.print(total_packets);
-        Serial.print("  (Normal: ");
-        Serial.print(normal_packets);
-        Serial.print(" | Warn: ");
-        Serial.print(warning_packets);
-        Serial.print(" | Crit: ");
-        Serial.print(critical_packets);
-        Serial.println(")");
-
-        Serial.println("║");
-        Serial.println("║  Node |  Soil%  |  Temp°C |  Hum%  | Rain  | Prio     | Noise");
-        Serial.println("║  ─────┼─────────┼─────────┼────────┼───────┼──────────┼──────");
-
-        const char* prio_labels[] = {"NORMAL ", "WARNING", "CRITCAL"};
-        const char* noise_labels[] = {"LOW ", "MED ", "HIGH", "VHIG"};
-
-        for (int i = 1; i <= 4; i++) {
-            if (node_seen[i]) {
-                struct_message &m = node_readings[i];
-                Serial.print("║    ");
-                Serial.print(i);
-                Serial.print("  |  ");
-                Serial.print(m.soil_moisture, 1);
-                Serial.print("%  |  ");
-                Serial.print(m.temperature, 1);
-                Serial.print("°C  |  ");
-                Serial.print(m.humidity, 1);
-                Serial.print("% | ");
-                Serial.print(m.rainfall, 1);
-                Serial.print("  | ");
-                Serial.print(prio_labels[m.priority]);
-                Serial.print("  | ");
-                Serial.println(noise_labels[m.noise_level]);
-            } else {
-                Serial.print("║    ");
-                Serial.print(i);
-                Serial.println("  |  -- offline --");
-            }
-        }
-
-        Serial.print("║  Shannon Entropy State: ");
-        Serial.println(current_entropy_idx);
-        Serial.println("╚══════════════════════════════════════════════════════════════╝");
+    // The Gateway no longer prints the dashboard locally. 
+    // It emits JSON frames inside OnDataRecv directly for the Python bridge.
+    
+    // We can emit a heartbeat/ping here to keep the connection active
+    static unsigned long last_ping = 0;
+    if (millis() - last_ping > 2000) {
+        last_ping = millis();
+        Serial.println("{\"t\":\"ping\",\"id\":0}");
     }
-
-    delay(100);
+    
+    delay(10);
 }

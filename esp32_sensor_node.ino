@@ -71,7 +71,7 @@ void updateEnvironment() {
     ou_step(soil_moisture, 55.0, 1.2, 0.03, 5.0, 100.0);
     ou_step(temperature,   28.0, 0.5, 0.05, -5.0, 50.0);
     ou_step(humidity,      65.0, 1.0, 0.04, 10.0, 100.0);
-    ou_step(rainfall,       2.0, 1.5, 0.06, 0.0, 80.0);
+    ou_step(rainfall,      -2.0, 1.5, 0.06, -10.0, 80.0);
 
     // Classify risk
     int breaches = 0;
@@ -80,15 +80,16 @@ void updateEnvironment() {
     if (rainfall > 15.0)      breaches++;
 
     // Flood risk composite
+    float sent_rainfall = max(0.0f, rainfall);
     float soil_f = max(0.0f, (soil_moisture - 50.0f)) / 50.0f;
-    float rain_f = min(1.0f, rainfall / 30.0f);
+    float rain_f = min(1.0f, sent_rainfall / 30.0f);
     float flood_risk = 0.4 * soil_f + 0.45 * rain_f + 0.15 * max(0.0f, (humidity - 70.0f) / 30.0f);
     if (flood_risk >= 0.7) breaches++;
 
     if (breaches >= 2)          { current_priority = 2; current_urgency = 10; }
     else if (flood_risk >= 0.7) { current_priority = 2; current_urgency = 10; }
     else if (temperature < 2.0) { current_priority = 2; current_urgency = 10; }
-    else if (rainfall > 15.0)   { current_priority = 1; current_urgency = 5;  }
+    else if (sent_rainfall > 15.0) { current_priority = 1; current_urgency = 5;  }
     else if (soil_moisture<30.0){ current_priority = 1; current_urgency = 5;  }
     else                        { current_priority = 0; current_urgency = 1;  }
 }
@@ -109,6 +110,9 @@ void readNoiseLevel() {
     smoothed_adc = (smoothed_adc * 0.9) + (raw_adc * 0.1);
     
     int adc = (int)smoothed_adc;
+    
+    // Debug print for potentiometer
+    // Serial.println("Raw ADC: " + String(raw_adc) + " | Smoothed: " + String(adc));
     
     if      (adc < 1024) current_noise_idx = 0;  // Low
     else if (adc < 2048) current_noise_idx = 1;  // Medium
@@ -252,6 +256,7 @@ void OnDataRecv(const esp_now_recv_info_t *info, const uint8_t *incomingData, in
 // ============================================================================
 void setup() {
     Serial.begin(115200);
+    pinMode(POTENTIOMETER_PIN, INPUT);
     randomSeed(analogRead(0) + SENSOR_ID * 1337);
     initQTable();
 
@@ -329,7 +334,7 @@ void loop() {
         myData.soil_moisture = soil_moisture;
         myData.temperature   = temperature;
         myData.humidity      = humidity;
-        myData.rainfall      = rainfall;
+        myData.rainfall      = max(0.0f, rainfall);
         myData.noise_level   = current_noise_idx;
 
         esp_now_send(gatewayAddress, (uint8_t *)&myData, sizeof(myData));

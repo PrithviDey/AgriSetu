@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriSetu — Smart LoRa Network</title>
+  <meta name="description"
+    content="AgriSetu: An intelligent LoRa network that learns, adapts, and optimizes communication for smarter agriculture. Teaching Sensors to Think Before They Speak." />
+  <link rel="icon" type="image/jpeg" href="dashboard/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@400;900&family=Outfit:wght@400;600;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="landing.css" />
+</head>
+
+<body>
+
+  <canvas id="particleCanvas"></canvas>
+
+
+  <!-- HERO SECTION -->
+  <section class="hero" id="home">
+    <div class="hero-bg">
+      <div class="hero-gradient-orb orb-1"></div>
+      <div class="hero-gradient-orb orb-2"></div>
+      <div class="hero-gradient-orb orb-3"></div>
+      <div class="grid-overlay"></div>
+    </div>
+
+    <div class="hero-container">
+      <!-- Centered Glassmorphic Hero Card -->
+      <div class="hero-glass-card" id="heroContent">
+
+        <div class="hero-badge" id="heroBadge">
+          <div class="badge-dot"></div>
+          <span>AI-Powered Agricultural Network</span>
+        </div>
+
+        <h1 class="hero-title" id="heroTitle">
+          <span class="title-agrisetu">AgriSetu</span>
+        </h1>
+
+        <div class="hero-tagline" id="heroTagline">
+          <span class="tagline-static">Teaching Sensors to </span>
+          <span class="tagline-dynamic" id="taglineDynamic">Op</span>
+          <br />
+          <span class="tagline-static">Before They Speak.</span>
+        </div>
+
+        <p class="hero-description" id="heroDesc">
+          An intelligent LoRa network that learns, adapts, and optimizes
+          communication for smarter agriculture. Powered by Q-Learning MAC
+          for unprecedented efficiency.
+        </p>
+
+        <div class="hero-actions" id="heroActions">
+          <button class="btn-get-started" onclick="enterDashboard()" id="btnEnterDashboard">
+            Enter Dashboard
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+
+
+
+
+  <div class="toast" id="toast"></div>
+
+  <script src="landing.js"></script>
+</body>
+
+</html>

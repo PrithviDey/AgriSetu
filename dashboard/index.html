@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriSetu - Smart LoRa Network </title>
+  <meta name="description"
+    content="Real-time monitoring of AgriSetu intelligent LoRa network with Q-Learning MAC for smart agriculture." />
+  <link rel="icon" type="image/jpeg" href="logo.jpg" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <img src="logo.jpg" alt="AgriSetu Logo" width="38" height="38"
+        style="border-radius: 10px; object-fit: cover; background: #fff;" />
+      <div class="sidebar-logo-text">
+        <h1>AgriSetu</h1>
+        <p>Smart LoRa Network</p>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="nav-section-label">Monitor</div>
+      <a class="nav-item active" href="#overview" onclick="scrollTo('overview')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="#nodes" onclick="scrollTo('nodes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="3" />
+          <path d="M5 20a7 7 0 0114 0" />
+          <circle cx="5" cy="14" r="2" />
+          <circle cx="19" cy="14" r="2" />
+        </svg>
+        Nodes
+      </a>
+      <a class="nav-item engineer-only" href="#network" onclick="scrollTo('network')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="2" />
+          <path
+            d="M4.93 4.93a10 10 0 000 14.14M19.07 4.93a10 10 0 010 14.14M8.46 8.46a5 5 0 000 7.08M15.54 8.46a5 5 0 010 7.08" />
+        </svg>
+        Network
+      </a>
+      <a class="nav-item" href="#alerts" onclick="scrollTo('alerts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+        </svg>
+        Alerts
+        <span class="nav-badge" id="alertBadge">0</span>
+      </a>
+
+      <div class="nav-section-label engineer-only">Analytics</div>
+      <a class="nav-item engineer-only" href="#qlearning" onclick="scrollTo('qlearning')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+        Q-Learning
+      </a>
+      <a class="nav-item engineer-only" href="#benchmark" onclick="scrollTo('benchmark')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10" />
+          <line x1="12" y1="20" x2="12" y2="4" />
+          <line x1="6" y1="20" x2="6" y2="14" />
+        </svg>
+        Benchmark
+      </a>
+
+      <div class="nav-section-label engineer-only">System</div>
+      <a class="nav-item engineer-only" href="#logs" onclick="scrollTo('logs')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <polyline points="10 9 9 9 8 9" />
+        </svg>
+        Packet Logs
+      </a>
+      <a class="nav-item engineer-only" href="#settings" onclick="scrollTo('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+        </svg>
+        Settings
+      </a>
+    </nav>
+
+    <!-- Gateway status -->
+    <div class="sidebar-bottom">
+      <div class="gateway-card">
+        <div class="gateway-card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" />
+          </svg>
+          <span>Gateway Status</span>
+        </div>
+        <div class="gateway-status-badge">
+          <div class="pulse-dot"></div><span id="gwStatus">Online</span>
+        </div>
+        <div class="gateway-uptime" id="gwUptime">Uptime: 0h 0m 0s</div>
+        <!-- Gateway activity sparkline -->
+        <svg class="gateway-sparkline" viewBox="0 0 120 28" preserveAspectRatio="none">
+          <path d="M0,14 Q10,6 20,14 T40,14 T60,7 T80,14 T100,14 T120,10" stroke="rgba(74,222,128,0.7)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M0,14 Q10,6 20,14 T40,14 T60,7 T80,14 T100,14 T120,10 L120,28 L0,28 Z" fill="rgba(74,222,128,0.12)"/>
+        </svg>
+      </div>
+    </div>
+    <div class="admin-row">
+      <div class="admin-avatar">AS</div>
+      <div class="admin-info">
+        <strong>Admin</strong>
+        <span>System Operator</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════════════════════════════
+     MAIN WRAPPER
+══════════════════════════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- Header -->
+    <header class="header">
+      <button id="sidebarToggle" class="btn-icon"
+        style="background:none; border:none; color:var(--text-primary); cursor:pointer; margin-right:12px; display:flex; align-items:center; padding: 4px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <div class="header-title">
+        <h2>Dashboard Overview</h2>
+        <p>Real-time monitoring of intelligent LoRa network for smart agriculture</p>
+      </div>
+      <div class="header-spacer"></div>
+      <button class="btn btn-sm" id="btnModeToggle" onclick="toggleFarmerMode()" style="margin-right: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); cursor: pointer; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 600; display: flex; align-items: center; gap: 6px;">
+        Farmer Mode
+      </button>
+      <div class="ws-indicator">
+        <div class="ws-dot" id="wsDot"></div>
+        <span id="wsLabel">Connecting...</span>
+      </div>
+      <div class="header-datetime">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <span id="headerDate">—</span>
+      </div>
+      <button class="btn-alert" id="btnCriticalAlert" onclick="scrollTo('alerts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+        </svg>
+        <span id="critCount">0</span> Critical Alerts
+      </button>
+    </header>
+
+    <!-- ── Content ─────────────────────────────────────────────────── -->
+    <div class="content">
+
+      <!-- ═══════════════════════════════════
+         SECTION 1 — Overview Stats
+    ════════════════════════════════════ -->
+      <section id="overview" class="scroll-anchor">
+        <div class="stats-grid">
+
+          <div class="stat-card green">
+            <div class="stat-header">
+              <span class="stat-label">Active Nodes</span>
+              <div class="stat-icon green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="8" r="3" />
+                  <path d="M5 20a7 7 0 0114 0" />
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value"><span id="statActiveNodes">—</span> <span
+                style="font-size:16px;color:var(--text-muted)">/ <span id="statTotalNodes">—</span></span></div>
+            <div class="stat-footer" id="statNodesPct">— % Online</div>
+            <canvas class="stat-sparkline" id="sparkNodes"></canvas>
+          </div>
+
+          <div class="stat-card blue engineer-only">
+            <div class="stat-header">
+              <span class="stat-label">Packet Delivery (PDR)
+                <span class="info-tooltip" title="Why 100% vs ALOHA? Q-Learning schedules each transmission in collision-free time slots by learning channel occupancy patterns. ALOHA transmits randomly, causing frequent packet collisions especially as node density grows.">
+                  &#9432;
+                </span>
+              </span>
+              <div class="stat-icon blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value"><span id="statPDR">—</span>%</div>
+            <div class="stat-delta up" id="statPDRDelta">— vs ALOHA</div>
+            <canvas class="stat-sparkline" id="sparkPDR"></canvas>
+          </div>
+
+          <div class="stat-card amber engineer-only">
+            <div class="stat-header">
+              <span class="stat-label">Collision Rate
+                <span class="info-tooltip" title="Why 0% vs ALOHA? Q-Learning uses reinforcement-learned backoff — it waits when the channel is busy and transmits only when idle. ALOHA has no channel awareness, so multiple nodes transmit simultaneously causing collisions.">
+                  &#9432;
+                </span>
+              </span>
+              <div class="stat-icon amber">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value"><span id="statCR">—</span>%</div>
+            <div class="stat-delta down" id="statCRDelta">— vs ALOHA</div>
+            <canvas class="stat-sparkline" id="sparkCR"></canvas>
+          </div>
+
+          <div class="stat-card purple">
+            <div class="stat-header">
+              <span class="stat-label">Avg Energy / Node</span>
+              <div class="stat-icon purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value"><span id="statEnergy">—</span> <span
+                style="font-size:14px;color:var(--text-muted)">mWh</span></div>
+            <div class="stat-footer">Today</div>
+            <canvas class="stat-sparkline" id="sparkEnergy"></canvas>
+          </div>
+
+          <div class="stat-card red">
+            <div class="stat-header">
+              <span class="stat-label">Critical Alerts</span>
+              <div class="stat-icon red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value" id="statCritical">—</div>
+            <div class="stat-footer" style="color:var(--danger)">Require Attention</div>
+            <canvas class="stat-sparkline" id="sparkCrit"></canvas>
+          </div>
+
+        </div>
+
+        <!-- Real-time offline node alert banner -->
+        <div id="offlineBanner" style="display:none; margin-top:10px; padding:10px 16px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.4); border-radius:8px; display:flex; align-items:center; gap:10px; animation: pulse-border 2s ease-in-out infinite;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span id="offlineBannerText" style="color:#EF4444; font-weight:600; font-size:13px;">Node offline detected</span>
+          <span style="margin-left:auto; color:#EF4444; opacity:0.7; font-size:11px;">Check Nodes section ↓</span>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════
+         SECTION 1.5 — Environmental Data
+      ════════════════════════════════════ -->
+      <section id="environmental" class="scroll-anchor" style="margin-top: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 24px;">
+            <div class="section-title" style="margin: 0; font-size: 16px; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
+              Environmental Telemetry
+            </div>
+            <select id="envNodeSelect" style="background: var(--bg); border: 1px solid var(--border); color: var(--text-primary); border-radius: var(--radius-sm); padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; outline: none;">
+              <option value="avg">Network Average</option>
+            </select>
+        </div>
+
+        <div class="stats-grid">
+          
+          <div class="env-card soil">
+            <div class="env-content">
+              <div class="env-icon" style="color: #16A34A; background: #DCFCE7;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>
+                </svg>
+              </div>
+              <div class="env-info">
+                <span class="stat-label" id="lblSoil">Avg Soil Moisture</span>
+                <div class="stat-value"><span id="statSoil">—</span>%</div>
+                <div class="stat-footer" id="footSoil">Across all nodes</div>
+              </div>
+            </div>
+            <div class="env-bg">
+              <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+                <path d="M0,60 Q100,80 200,50 T400,60 L400,100 L0,100 Z" fill="#8B5A2B" opacity="0.6"/>
+                <path d="M0,70 Q150,90 250,60 T400,80 L400,100 L0,100 Z" fill="#6B4226"/>
+                <!-- small plants -->
+                <path d="M50,70 Q55,50 60,70" stroke="#22C55E" stroke-width="3" fill="none"/>
+                <path d="M55,60 Q60,55 65,65" stroke="#22C55E" stroke-width="2" fill="none"/>
+                <path d="M280,60 Q285,40 290,60" stroke="#16A34A" stroke-width="4" fill="none"/>
+                <path d="M285,50 Q295,45 300,55" stroke="#16A34A" stroke-width="3" fill="none"/>
+                <path d="M285,50 Q275,45 270,55" stroke="#16A34A" stroke-width="3" fill="none"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="env-card temp">
+            <div class="env-content">
+              <div class="env-icon" style="color: #EA580C; background: #FFEDD5;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/>
+                </svg>
+              </div>
+              <div class="env-info">
+                <span class="stat-label" id="lblTemp">Avg Temperature</span>
+                <div class="stat-value"><span id="statTemp">—</span>°C</div>
+                <div class="stat-footer" id="footTemp">Across all nodes</div>
+              </div>
+            </div>
+            <div class="env-bg">
+              <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+                <!-- sun -->
+                <circle cx="320" cy="40" r="20" fill="#FDE047" opacity="0.8"/>
+                <!-- dunes -->
+                <path d="M0,80 Q100,50 200,80 T400,70 L400,100 L0,100 Z" fill="#FDBA74" opacity="0.7"/>
+                <path d="M0,100 Q150,70 300,90 T400,80 L400,100 L0,100 Z" fill="#F97316" opacity="0.9"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="env-card hum">
+            <div class="env-content">
+              <div class="env-icon" style="color: #0D9488; background: #CCFBF1;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+              <div class="env-info">
+                <span class="stat-label" id="lblHum">Avg Humidity</span>
+                <div class="stat-value"><span id="statHum">—</span>%</div>
+                <div class="stat-footer" id="footHum">Across all nodes</div>
+              </div>
+            </div>
+            <div class="env-bg">
+              <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+                <path d="M0,70 Q100,50 200,70 T400,50 L400,100 L0,100 Z" fill="#6EE7B7" opacity="0.5"/>
+                <path d="M0,80 Q150,60 250,80 T400,60 L400,100 L0,100 Z" fill="#10B981" opacity="0.8"/>
+                <!-- trees -->
+                <path d="M50,85 L60,60 L70,85 Z" fill="#047857"/>
+                <path d="M80,90 L95,50 L110,90 Z" fill="#065F46"/>
+                <path d="M320,80 L330,55 L340,80 Z" fill="#047857"/>
+                <path d="M350,90 L365,45 L380,90 Z" fill="#065F46"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="env-card rain">
+            <div class="env-content">
+              <div class="env-icon" style="color: #2563EB; background: #DBEAFE;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 16.58A5 5 0 0018 7h-1.26A8 8 0 104 15.25"/>
+                  <line x1="8" y1="21" x2="8" y2="17"/>
+                  <line x1="12" y1="21" x2="12" y2="17"/>
+                  <line x1="16" y1="21" x2="16" y2="17"/>
+                </svg>
+              </div>
+              <div class="env-info">
+                <span class="stat-label" id="lblRain">Rainfall (Avg)</span>
+                <div class="stat-value"><span id="statRain">—</span> mm</div>
+                <div class="stat-footer" id="footRain">Across all nodes</div>
+              </div>
+            </div>
+            <div class="env-bg">
+              <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+                <path d="M0,75 Q100,55 200,75 T400,75 L400,100 L0,100 Z" fill="#93C5FD" opacity="0.6"/>
+                <path d="M0,85 Q150,65 250,85 T400,75 L400,100 L0,100 Z" fill="#3B82F6" opacity="0.8"/>
+                <!-- raindrops -->
+                <line x1="50" y1="40" x2="45" y2="55" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+                <line x1="120" y1="30" x2="115" y2="45" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+                <line x1="280" y1="35" x2="275" y2="50" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+                <line x1="350" y1="45" x2="345" y2="60" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════
+         SECTION 2 — Network Topology + Channel Conditions
+    ════════════════════════════════════ -->
+      <section id="network" class="scroll-anchor engineer-only">
+        <div class="two-col">
+
+          <!-- Topology -->
+          <div class="card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" />
+                  </svg>
+                  Network Topology
+                </div>
+                <div class="section-sub">Live node connections to gateway</div>
+              </div>
+              <div class="live-badge">Live</div>
+            </div>
+            <canvas id="topoCanvas"></canvas>
+            <!-- Topology footer stats bar -->
+            <div class="topo-footer-stats">
+              <div class="topo-footer-stat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <span id="topoNodeCount">4/4 Nodes Online</span>
+              </div>
+              <div class="topo-footer-stat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
+                <span id="topoSignal">Strong Signal</span>
+              </div>
+              <div class="topo-footer-stat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0014.08 0M1.42 9a16 16 0 0021.16 0M8.53 16.11a6 6 0 006.95 0M12 20h.01"/></svg>
+                <span>Stable Network</span>
+              </div>
+            </div>
+            <div class="topo-legend">
+              <div class="topo-legend-item"><div class="topo-dot" style="background:#22C55E"></div> Online</div>
+              <div class="topo-legend-item"><div class="topo-dot" style="background:#F59E0B"></div> Warning</div>
+              <div class="topo-legend-item"><div class="topo-dot" style="background:#9CA3AF"></div> Offline</div>
+              <div class="topo-legend-item"><div class="topo-dot" style="background:#EF4444"></div> Critical</div>
+            </div>
+          </div>
+
+          <!-- Channel Conditions -->
+          <div class="card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                  Channel Conditions
+                </div>
+                <div class="section-sub">Current link-layer state vector</div>
+              </div>
+            </div>
+            <div class="channel-grid">
+              <div class="channel-row">
+                <div>
+                  <div class="channel-label">RSSI</div>
+                  <div class="channel-sublabel">Signal Strength</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="channel-val" id="chRSSI">—</div>
+                  <span class="channel-badge badge-good" id="chRSSIBadge">—</span>
+                </div>
+              </div>
+              <div class="channel-row">
+                <div>
+                  <div class="channel-label">SF (Spreading Factor)</div>
+                  <div class="channel-sublabel">Range / Duration tradeoff</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="channel-val" id="chSF">—</div>
+                  <span class="channel-badge badge-low" id="chSFBadge">—</span>
+                </div>
+              </div>
+              <div class="channel-row">
+                <div>
+                  <div class="channel-label">CR (Coding Rate)</div>
+                  <div class="channel-sublabel">Error correction</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="channel-val" id="chCR">—</div>
+                  <span class="channel-badge badge-medium" id="chCRBadge">—</span>
+                </div>
+              </div>
+              <div class="channel-row">
+                <div>
+                  <div class="channel-label">Entropy (Noise)</div>
+                  <div class="channel-sublabel">Channel randomness</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="channel-val" id="chEntropy">—</div>
+                  <span class="channel-badge badge-low" id="chEntropyBadge">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini live Q-state display -->
+            <div
+              style="margin-top:16px;padding:12px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border)">
+              <div class="section-title" style="font-size:12px;margin-bottom:8px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                </svg>
+                Current Q-Learning State → Action
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <span
+                  style="font-size:11px;background:#DCFCE7;color:var(--primary);padding:3px 8px;border-radius:4px;font-weight:600">S:
+                  [<span id="qlStateVec">—</span>]</span>
+                <span
+                  style="font-size:11px;background:#DCFCE7;color:#15803D;padding:3px 8px;border-radius:4px;font-weight:600">A:
+                  <span id="qlActionName">—</span></span>
+                <span
+                  style="font-size:11px;background:#F0FDF4;color:#16A34A;padding:3px 8px;border-radius:4px;font-weight:600">ε:
+                  <span id="qlEpsilon">—</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════
+         SECTION 3 — Alerts
+    ════════════════════════════════════ -->
+      <section id="alerts" class="scroll-anchor">
+        <div class="two-col">
+          <div class="card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+                  </svg>
+                  Recent Alerts
+                </div>
+                <div class="section-sub">System events and critical notifications</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn btn-sm btn-danger" onclick="triggerCritical()">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                  </svg>
+                  Trigger Critical
+                </button>
+                <span class="section-badge" id="alertCountBadge">0 alerts</span>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Node</th>
+                    <th>Severity</th>
+                    <th>Message</th>
+                  </tr>
+                </thead>
+                <tbody id="alertsTableBody">
+                  <tr>
+                    <td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px">Waiting for data...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Packets Log -->
+          <div class="card">
+            <div class="section-header">
+              <div>
+                <div class="section-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                  </svg>
+                  Received Packets
+                </div>
+                <div class="section-sub">Live packet reception and priorities</div>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Node</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Latency</th>
+                  </tr>
+                </thead>
+                <tbody id="packetsTableBody">
+                  <tr>
+                    <td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px">Waiting for data...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════
+         SECTION 4 — Nodes Grid
+    ════════════════════════════════════ -->
+      <section id="nodes" class="scroll-anchor">
+        <div class="card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="8" r="3" />
+                  <path d="M5 20a7 7 0 0114 0" />
+                  <circle cx="5" cy="14" r="2" />
+                  <circle cx="19" cy="14" r="2" />
+                </svg>
+                Node Status Grid
+              </div>
+              <div class="section-sub">All sensor nodes — battery, signal, packet delivery</div>
+            </div>
+            <span class="live-badge">Live</span>
+          </div>
+          <div class="node-grid" id="nodeGrid">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════
+         SECTION 6 — Benchmark
+    ════════════════════════════════════ -->
+      <section id="benchmark" class="scroll-anchor engineer-only">
+        <div class="card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="20" x2="18" y2="10" />
+                  <line x1="12" y1="20" x2="12" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+                PDR Benchmark — AgriSetu vs Standard ALOHA
+              </div>
+              <div class="section-sub">Packet Delivery Rate across node densities (10–1000 nodes)</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap" style="height:280px"><canvas id="benchmarkChart"></canvas></div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════
+         SECTION 7 — Q-Learning
+    ════════════════════════════════════ -->
+      <section id="qlearning" class="scroll-anchor engineer-only">
+        <div class="section-header">
+          <div>
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+              Q-Learning Engine
+            </div>
+            <div class="section-sub">Real-time Q-table state, reward trend, and action distribution</div>
+          </div>
+          <div class="live-badge">Live</div>
+        </div>
+
+        <!-- RL KPI row -->
+        <div class="rl-stats-row" style="margin-bottom:16px">
+          <div class="rl-stat">
+            <div class="rl-stat-val" id="rlAvgReward">—</div>
+            <div class="rl-stat-label">Avg Reward (last 100)</div>
+          </div>
+          <div class="rl-stat">
+            <div class="rl-stat-val" id="rlUpdates">—</div>
+            <div class="rl-stat-label">Q-Table Updates</div>
+          </div>
+          <div class="rl-stat">
+            <div class="rl-stat-val" id="rlEpsilon2">—</div>
+            <div class="rl-stat-label">ε (Exploration)</div>
+          </div>
+          <div class="rl-stat">
+            <div class="rl-stat-val" id="rlAlpha">—</div>
+            <div class="rl-stat-label">Learning Rate (α)</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <!-- Reward trend -->
+          <div class="card">
+            <div class="section-title" style="margin-bottom:14px;font-size:13px">Reward History</div>
+            <div class="chart-canvas-wrap" style="height:220px"><canvas id="rewardChart"></canvas></div>
+          </div>
+          <!-- Action distribution -->
+          <div class="card">
+            <div class="section-title" style="margin-bottom:14px;font-size:13px">Action Distribution</div>
+            <div class="two-col" style="gap:16px;align-items:center">
+              <div class="chart-canvas-wrap" style="height:180px"><canvas id="actionPieChart"></canvas></div>
+              <div>
+                <div class="action-bars" id="actionBars">
+                  <!-- populated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q-Table heatmap -->
+        <div class="card" style="margin-top:16px">
+          <div class="section-title" style="margin-bottom:14px;font-size:13px">Q-Table Heatmap (108 States × 5 Actions)
+            — Hover to inspect</div>
+          <canvas id="qtableCanvas" style="width:100%;height:200px;border-radius:6px;cursor:crosshair"></canvas>
+          <div id="qtableHover" style="font-size:11px;color:var(--text-muted);margin-top:6px;min-height:16px"></div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════
+         SECTION 8 — Packet Logs
+    ════════════════════════════════════ -->
+      <section id="logs" class="scroll-anchor engineer-only">
+        <div class="card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Packet Logs
+              </div>
+            </div>
+            <button class="btn btn-sm btn-secondary" onclick="exportLogs()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
+          <div class="logs-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pkt ID</th>
+                  <th>Node</th>
+                  <th>Priority</th>
+                  <th>Action</th>
+                  <th>Result</th>
+                  <th>Energy (mWh)</th>
+                  <th>Latency (ms)</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody">
+                <tr>
+                  <td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px">Waiting for data...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════
+         SECTION 9 — Settings
+    ════════════════════════════════════ -->
+      <section id="settings" class="scroll-anchor engineer-only">
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+              </svg>
+              Settings &amp; Control
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <!-- Q-Learning params -->
+            <div class="settings-group">
+              <div class="settings-group-title">Q-Learning Hyperparameters</div>
+              <div class="form-row">
+                <label class="form-label" for="sAlpha">Learning Rate (α)</label>
+                <input type="range" class="form-range" id="sAlpha" min="0.01" max="0.5" step="0.01" value="0.15"
+                  oninput="document.getElementById('sAlphaVal').textContent=this.value" />
+                <span class="form-range-val">α = <strong id="sAlphaVal">0.15</strong></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="sGamma">Discount Factor (γ)</label>
+                <input type="range" class="form-range" id="sGamma" min="0.5" max="0.99" step="0.01" value="0.90"
+                  oninput="document.getElementById('sGammaVal').textContent=this.value" />
+                <span class="form-range-val">γ = <strong id="sGammaVal">0.90</strong></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="sEpsDecay">Epsilon Decay</label>
+                <input type="range" class="form-range" id="sEpsDecay" min="0.990" max="0.999" step="0.001" value="0.997"
+                  oninput="document.getElementById('sEpsDecayVal').textContent=this.value" />
+                <span class="form-range-val">decay = <strong id="sEpsDecayVal">0.997</strong></span>
+              </div>
+            </div>
+
+            <!-- Reward weights -->
+            <div class="settings-group">
+              <div class="settings-group-title">Reward Weights R = α·Delivery − β·Energy + γ·Urgency</div>
+              <div class="form-row">
+                <label class="form-label" for="sWDelivery">Delivery Weight (α)</label>
+                <input type="range" class="form-range" id="sWDelivery" min="0.5" max="3.0" step="0.1" value="1.0"
+                  oninput="document.getElementById('sWDeliveryVal').textContent=this.value" />
+                <span class="form-range-val">α = <strong id="sWDeliveryVal">1.0</strong></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="sWEnergy">Energy Penalty (β)</label>
+                <input type="range" class="form-range" id="sWEnergy" min="0.0" max="1.0" step="0.05" value="0.10"
+                  oninput="document.getElementById('sWEnergyVal').textContent=this.value" />
+                <span class="form-range-val">β = <strong id="sWEnergyVal">0.10</strong></span>
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="sWUrgency">Urgency Bonus (γ)</label>
+                <input type="range" class="form-range" id="sWUrgency" min="0.5" max="5.0" step="0.1" value="2.0"
+                  oninput="document.getElementById('sWUrgencyVal').textContent=this.value" />
+                <span class="form-range-val">γ = <strong id="sWUrgencyVal">2.0</strong></span>
+              </div>
+            </div>
+
+            <!-- Simulation control -->
+            <div class="settings-group">
+              <div class="settings-group-title">Simulation Control</div>
+              <div class="form-row">
+                <label class="form-label" for="sNodeCount">Node Count</label>
+                <input type="number" class="form-input" id="sNodeCount" min="1" max="100" value="20" />
+              </div>
+              <div class="form-row">
+                <label class="form-label" for="sSimSpeed">Sim Speed (ticks/sec)</label>
+                <select class="form-input" id="sSimSpeed">
+                  <option value="2.0">0.5× (slow)</option>
+                  <option value="1.0" selected>1× (normal)</option>
+                  <option value="0.5">2× (fast)</option>
+                  <option value="0.2">5× (very fast)</option>
+                </select>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="ctrlStart()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                  Start
+                </button>
+                <button class="btn btn-secondary" onclick="ctrlStop()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                  </svg>
+                  Pause
+                </button>
+                <button class="btn btn-danger" onclick="ctrlReset()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10" />
+                    <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+                  </svg>
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            <!-- Hardware config (ESP32) -->
+            <div class="settings-group">
+              <div class="settings-group-title">
+                Hardware / ESP32 Serial Bridge
+                <span id="hwStatusBadge"
+                  style="margin-left:8px;font-size:10px;padding:2px 8px;border-radius:99px;background:#FEE2E2;color:#DC2626;font-weight:600">Disconnected</span>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label" for="sComPort">Serial COM Port</label>
+                <div style="display:flex;gap:8px">
+                  <select class="form-input" id="sComPort" style="flex:1">
+                    <option value="">-- Select Port --</option>
+                  </select>
+                  <button class="btn btn-secondary btn-sm" onclick="scanPorts()" style="white-space:nowrap">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="1 4 1 10 7 10" />
+                      <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+                    </svg>
+                    Scan
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label" for="sBaud">Baud Rate</label>
+                <select class="form-input" id="sBaud">
+                  <option value="9600">9600</option>
+                  <option value="115200" selected>115200</option>
+                  <option value="921600">921600</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label">Hardware Mode</label>
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+                  <label
+                    style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text-secondary)">
+                    <input type="checkbox" id="sHwMode" style="accent-color:var(--primary)" />
+                    Disable software simulation (pure hardware data)
+                  </label>
+                </div>
+              </div>
+
+              <!-- HW status info -->
+              <div id="hwStatusInfo"
+                style="display:none;padding:10px 12px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);font-size:11px;color:var(--text-secondary)">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                  <div>Port: <strong id="hwInfoPort">—</strong></div>
+                  <div>Baud: <strong id="hwInfoBaud">—</strong></div>
+                  <div>Frames received: <strong id="hwInfoRx">0</strong></div>
+                  <div>Last frame: <strong id="hwInfoLast">—</strong></div>
+                  <div>Errors: <strong id="hwInfoErr">0</strong></div>
+                  <div>Queue depth: <strong id="hwInfoQ">0</strong></div>
+                </div>
+                <div id="hwInfoError" style="color:var(--danger);margin-top:4px;display:none"></div>
+              </div>
+
+              <div class="btn-row">
+                <button class="btn btn-success" id="btnHwConnect" onclick="hwConnect()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0" />
+                    <circle cx="12" cy="20" r="1" />
+                  </svg>
+                  Connect ESP32
+                </button>
+                <button class="btn btn-danger btn-sm" id="btnHwDisconnect" onclick="hwDisconnect()"
+                  style="display:none">
+                  Disconnect
+                </button>
+              </div>
+
+              <!-- ESP32 Protocol Quick Reference -->
+              <details style="margin-top:12px">
+                <summary style="font-size:11px;font-weight:600;color:var(--primary);cursor:pointer;padding:6px 0">
+                  ESP32 Protocol Reference (click to expand)
+                </summary>
+                <div
+                  style="margin-top:8px;padding:10px;background:#F0F7F0;border-radius:6px;font-size:11px;font-family:monospace;color:#052E16;line-height:1.7">
+                  <strong>// Send every 500ms (node telemetry)</strong><br>
+                  {"t":"nd","id":1,"rssi":-74.2,"sf":9,"cr":0.5,"bat":87.3}<br><br>
+                  <strong>// Send after each TX attempt (result)</strong><br>
+                  {"t":"tx","id":1,"ok":1,"pri":"normal","e":0.082,"lat":245,"act":2}<br><br>
+                  <strong>// Heartbeat every 2s</strong><br>
+                  {"t":"ping","id":1}<br><br>
+                  <strong>// Action codes: 0=TX now, 1=wait1, 2=wait2, 3=wait4, 4=wait8</strong><br>
+                  <strong>// pri codes: "normal" | "warning" | "critical"</strong>
+                </div>
+              </details>
+
+              <div style="margin-top:12px">
+                <button class="btn btn-primary" onclick="saveSettings()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                    <polyline points="17 21 17 13 7 13 7 21" />
+                    <polyline points="7 3 7 8 15 8" />
+                  </svg>
+                  Save RL Settings
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /content -->
+
+    <footer class="footer">
+      <span>AgriSetu</span> • Teaching Sensors to Think Before They Speak • The CodeFatherz, IEM Kolkata
+    </footer>
+  </div><!-- /main-wrapper -->
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    let isFarmerMode = false;
+    function toggleFarmerMode() {
+      isFarmerMode = !isFarmerMode;
+      document.body.classList.toggle('farmer-mode', isFarmerMode);
+      const btn = document.getElementById('btnModeToggle');
+      if (isFarmerMode) {
+        btn.innerHTML = 'Engineer Mode';
+        btn.style.background = '#dcfce7';
+        btn.style.borderColor = '#16a34a';
+        btn.style.color = '#16a34a';
+      } else {
+        btn.innerHTML = 'Farmer Mode';
+        btn.style.background = 'var(--bg)';
+        btn.style.borderColor = 'var(--border)';
+        btn.style.color = 'var(--text-primary)';
+      }
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+
+</html>
